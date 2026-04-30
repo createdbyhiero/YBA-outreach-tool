@@ -559,7 +559,7 @@ async function submitLog() {
         keyword,
         variant: variant || '',
         status,
-        notes: template ? `Template: ${template}${notes ? ' | ' + notes : ''}` : notes,
+        notes: notes,
         date: new Date().toISOString().split('T')[0]
       })
     });
