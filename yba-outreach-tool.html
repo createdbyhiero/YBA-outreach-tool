@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>YBA Outreach</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #1a1a1a;
+    --border: #222222;
+    --accent: #b388ff;
+    --accent2: #f5a623;
+    --accent3: #42d4f5;
+    --text: #f0f0f0;
+    --muted: #666;
+    --danger: #ff4d4d;
+    --success: #b388ff;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+
+  /* HEADER */
+  .header {
+    padding: 20px 20px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: -0.5px;
+  }
+  .logo span { color: var(--accent); }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 6px;
+    padding: 16px 20px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .tab.active {
+    background: var(--accent);
+    color: #000;
+    border-color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* PANELS */
+  .panel { display: none; padding: 0 20px; }
+  .panel.active { display: block; }
+
+  /* SECTION LABEL */
+  .section-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  /* FORM */
+  .field { margin-bottom: 14px; }
+  .field label {
+    display: block;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .field input, .field select, .field textarea {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.15s;
+    -webkit-appearance: none;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    border-color: var(--accent);
+  }
+  .field textarea { resize: none; height: 80px; }
+  .field select option { background: #1a1a1a; }
+
+  /* KEYWORD ROW */
+  .keyword-row {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+  }
+  .keyword-row .field { flex: 1; margin-bottom: 0; }
+  .keyword-add-btn {
+    flex-shrink: 0;
+    height: 46px;
+    width: 46px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--accent);
+    font-size: 22px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* KEYWORD CHIPS */
+  .keyword-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 14px;
+    min-height: 0;
+  }
+  .chip {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid transparent;
+    transition: all 0.1s;
+  }
+  .chip.ready { background: #1a2200; border-color: var(--accent); color: var(--accent); }
+  .chip.cooldown { background: #1a1200; border-color: var(--accent2); color: var(--accent2); }
+  .chip .chip-x { opacity: 0.5; font-size: 13px; }
+
+  /* SUBMIT BTN */
+  .submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+    margin-top: 6px;
+  }
+  .submit-btn:active { transform: scale(0.98); opacity: 0.85; }
+  .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--accent);
+    color: #000;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    z-index: 999;
+    white-space: nowrap;
+  }
+  .toast.error { background: var(--danger); color: #fff; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* KEYWORD DASHBOARD */
+  .kw-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 10px;
+  }
+  .kw-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+  .kw-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+  }
+  .kw-badge {
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
+  }
+  .kw-badge.ready { background: #1a2200; color: var(--accent); }
+  .kw-badge.cooldown { background: #1a1200; color: var(--accent2); }
+  .kw-stats {
+    display: flex;
+    gap: 16px;
+  }
+  .kw-stat { font-size: 11px; color: var(--muted); }
+  .kw-stat strong { color: var(--text); font-size: 18px; display: block; font-family: 'Syne', sans-serif; }
+  .kw-bar-wrap {
+    margin-top: 10px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .kw-bar { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.5s; }
+
+  /* COOLDOWN SETTING */
+  .cooldown-setting {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+  }
+  .cooldown-setting label { font-size: 12px; color: var(--muted); }
+  .cooldown-setting input {
+    width: 60px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 10px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    text-align: center;
+    outline: none;
+  }
+
+  /* EMPTY STATE */
+  .empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; }
+
+  /* DIVIDER */
+  .divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+  /* STATUS INDICATOR */
+  .notion-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  /* VARIANT PILLS */
+  .variant-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+  .variant-pill {
+    padding: 8px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .variant-pill.selected {
+    border-color: #b388ff;
+    background: #1a0a2e;
+    color: #b388ff;
+  }
+
+  .date-display {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+    margin-bottom: 16px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">YBA<span>.</span></div>
+  <div class="notion-status"><div class="dot"></div><span>Notion connected</span></div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('log')">Log DM</button>
+  <button class="tab" onclick="switchTab('keywords')">Keywords</button>
+  <button class="tab" onclick="switchTab('settings')">Settings</button>
+</div>
+
+<!-- LOG DM PANEL -->
+<div class="panel active" id="panel-log">
+  <div class="date-display" id="date-display"></div>
+
+  <div class="section-label">Quick Log</div>
+
+  <div class="field">
+    <label>Instagram Username</label>
+    <input type="text" id="username" placeholder="e.g. toninotion_" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+  </div>
+
+  <div class="field">
+    <label>Notion Template They Sell</label>
+    <input type="text" id="template" placeholder="e.g. Second brain & habit os" autocorrect="off" spellcheck="false">
+  </div>
+
+  <div class="field">
+    <label>Keyword Used to Find Them</label>
+    <div class="keyword-row">
+      <div class="field" style="margin-bottom:0">
+        <input type="text" id="keyword-input" placeholder="e.g. #notiontemplate" autocorrect="off" autocapitalize="none" spellcheck="false">
+      </div>
+      <button class="keyword-add-btn" onclick="addKeywordFromInput()">+</button>
+    </div>
+    <div style="font-size:10px;color:#666;margin-top:6px;">Tap + to save a keyword. It stays until you change it.</div>
+  </div>
+
+  <div class="keyword-chips" id="keyword-chips"></div>
+
+  <div class="field">
+    <label>DM Variant Sent</label>
+    <div class="variant-pills" id="variant-pills">
+      <button class="variant-pill" onclick="selectVariant(this, 'Sales/Perform. Bucket: Performance Trig.')">Performance</button>
+      <button class="variant-pill" onclick="selectVariant(this, 'Sales/Perform. Bucket: Gap Trig.')">Gap</button>
+      <button class="variant-pill" onclick="selectVariant(this, 'Sales/Perform. Bucket: Compare Trig.')">Compare</button>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Status</label>
+    <select id="status">
+      <option value="Not Answered">⬜ Not Answered</option>
+      <option value="Answered Positively">🟠 Answered Positively</option>
+      <option value="Answered Negatively">🔴 Answered Negatively</option>
+      <option value="Confirmed">🟢 Confirmed</option>
+      <option value="DM Sent">✅ DM Sent</option>
+      <option value="Skip">❌ Skip</option>
+      <option value="Follow Up">➡️ Follow Up</option>
+      <option value="Replied">💬 Replied</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Notes (optional)</label>
+    <textarea id="notes" placeholder="Any extra context..."></textarea>
+  </div>
+
+  <button class="submit-btn" id="submit-btn" onclick="submitLog()">Submit to Notion →</button>
+</div>
+
+<!-- KEYWORDS PANEL -->
+<div class="panel" id="panel-keywords">
+  <div class="section-label">Keyword Performance</div>
+  <div id="kw-list"></div>
+</div>
+
+<!-- SETTINGS PANEL -->
+<div class="panel" id="panel-settings">
+  <div class="section-label">Cooldown Settings</div>
+  <div class="cooldown-setting">
+    <label>Default keyword cooldown (days)</label>
+    <input type="number" id="default-cooldown" value="3" min="1" max="30" onchange="saveCooldown()">
+  </div>
+  <div class="section-label" style="margin-top:20px">Per-Keyword Cooldown</div>
+  <div id="per-kw-cooldown"></div>
+
+  <div class="divider"></div>
+  <div class="section-label">Notion Config</div>
+  <div class="field">
+    <label>API Token</label>
+    <input type="password" id="notion-token" placeholder="ntn_..." autocomplete="off">
+  </div>
+  <div class="field">
+    <label>Database ID</label>
+    <input type="text" id="notion-db" placeholder="Database ID" autocomplete="off">
+  </div>
+  <button class="submit-btn" onclick="saveSettings()">Save Settings</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────
+const PIPEDREAM_URL = 'https://eorp4n2ix9po5lq.m.pipedream.net';
+const DEFAULT_TOKEN = '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';
+const DEFAULT_DB_ID = '1cda5f4caf47815185a4c0b4b8c6394a';
+
+// ─── STATE ────────────────────────────────────────────────
+let state = {
+  token: DEFAULT_TOKEN,
+  dbId: DEFAULT_DB_ID,
+  defaultCooldown: 3,
+  keywords: {}, // { keyword: { uses: N, clients: N, lastUsed: ISO, cooldownDays: N } }
+  selectedVariant: '',
+  selectedKeyword: ''
+};
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem('yba_state');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      state = { ...state, ...parsed };
+      if (!state.token) state.token = DEFAULT_TOKEN;
+      if (!state.dbId) state.dbId = DEFAULT_DB_ID;
+    }
+  } catch(e) {}
+}
+
+function saveState() {
+  localStorage.setItem('yba_state', JSON.stringify(state));
+}
+
+// ─── INIT ─────────────────────────────────────────────────
+loadState();
+document.getElementById('date-display').textContent = new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+document.getElementById('notion-token').value = state.token || '';
+document.getElementById('notion-db').value = state.dbId || '';
+document.getElementById('default-cooldown').value = state.defaultCooldown || 3;
+renderKeywordChips();
+renderKeywordDashboard();
+renderPerKwCooldown();
+
+// ─── TABS ─────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+  if (tab === 'keywords') renderKeywordDashboard();
+  if (tab === 'settings') renderPerKwCooldown();
+}
+
+// ─── KEYWORD CHIPS ────────────────────────────────────────
+function addKeywordFromInput() {
+  const input = document.getElementById('keyword-input');
+  const val = input.value.trim();
+  if (!val) return;
+  selectKeyword(val);
+  input.value = '';
+}
+
+function selectKeyword(kw) {
+  state.selectedKeyword = kw;
+  if (!state.keywords[kw]) {
+    state.keywords[kw] = { uses: 0, clients: 0, lastUsed: null, cooldownDays: state.defaultCooldown };
+  }
+  saveState();
+  renderKeywordChips();
+}
+
+function renderKeywordChips() {
+  const wrap = document.getElementById('keyword-chips');
+  const keywords = Object.keys(state.keywords);
+  if (!keywords.length) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = keywords.map(kw => {
+    const data = state.keywords[kw];
+    const ready = isKeywordReady(kw);
+    const isSelected = state.selectedKeyword === kw;
+    return `<div class="chip ${ready ? 'ready' : 'cooldown'}" onclick="selectKeyword('${kw}')" style="${isSelected ? 'outline:2px solid #c8f542;' : ''}">
+      ${kw} <span class="chip-x" onclick="removeKeyword(event,'${kw}')">×</span>
+    </div>`;
+  }).join('');
+}
+
+function removeKeyword(e, kw) {
+  e.stopPropagation();
+  delete state.keywords[kw];
+  if (state.selectedKeyword === kw) state.selectedKeyword = '';
+  saveState();
+  renderKeywordChips();
+}
+
+function isKeywordReady(kw) {
+  const data = state.keywords[kw];
+  if (!data || !data.lastUsed) return true;
+  const last = new Date(data.lastUsed);
+  const cooldown = (data.cooldownDays || state.defaultCooldown) * 86400000;
+  return (Date.now() - last.getTime()) >= cooldown;
+}
+
+function daysUntilReady(kw) {
+  const data = state.keywords[kw];
+  if (!data || !data.lastUsed) return 0;
+  const last = new Date(data.lastUsed);
+  const cooldown = (data.cooldownDays || state.defaultCooldown) * 86400000;
+  const diff = cooldown - (Date.now() - last.getTime());
+  return Math.ceil(diff / 86400000);
+}
+
+// ─── VARIANT ──────────────────────────────────────────────
+function selectVariant(el, variant) {
+  document.querySelectorAll('.variant-pill').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  state.selectedVariant = variant;
+}
+
+// ─── SUBMIT ───────────────────────────────────────────────
+async function submitLog() {
+  const username = document.getElementById('username').value.trim();
+  const template = document.getElementById('template').value.trim();
+  const keyword = state.selectedKeyword || document.getElementById('keyword-input').value.trim();
+  const variant = state.selectedVariant;
+  const status = document.getElementById('status').value;
+  const notes = document.getElementById('notes').value.trim();
+
+  if (!username) { showToast('Add a username first', true); return; }
+  if (!keyword) { showToast('Select or type a keyword', true); return; }
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+
+  try {
+    const res = await fetch(PIPEDREAM_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username,
+        template,
+        keyword,
+        variant: variant || '',
+        status,
+        notes: template ? `Template: ${template}${notes ? ' | ' + notes : ''}` : notes,
+        date: new Date().toISOString().split('T')[0]
+      })
+    });
+
+    if (res.ok) {
+      if (!state.keywords[keyword]) {
+        state.keywords[keyword] = { uses: 0, clients: 0, lastUsed: null, cooldownDays: state.defaultCooldown };
+      }
+      state.keywords[keyword].uses += 1;
+      state.keywords[keyword].clients += 1;
+      state.keywords[keyword].lastUsed = new Date().toISOString();
+      saveState();
+
+      document.getElementById('username').value = '';
+      document.getElementById('template').value = '';
+      document.getElementById('notes').value = '';
+      document.querySelectorAll('.variant-pill').forEach(p => p.classList.remove('selected'));
+      state.selectedVariant = '';
+      renderKeywordChips();
+      showToast('✓ Logged to Notion');
+    } else {
+      showToast('Something went wrong', true);
+    }
+  } catch(e) {
+    showToast('Network error', true);
+    console.log(e);
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Submit to Notion →';
+}
+
+// ─── KEYWORD DASHBOARD ────────────────────────────────────
+function renderKeywordDashboard() {
+  const wrap = document.getElementById('kw-list');
+  const keywords = Object.keys(state.keywords);
+  if (!keywords.length) {
+    wrap.innerHTML = '<div class="empty">No keywords logged yet.<br>Start DMing to see data here.</div>';
+    return;
+  }
+
+  const sorted = keywords.sort((a, b) => (state.keywords[b].clients || 0) - (state.keywords[a].clients || 0));
+  const maxClients = Math.max(...sorted.map(k => state.keywords[k].clients || 0), 1);
+
+  wrap.innerHTML = sorted.map((kw, i) => {
+    const data = state.keywords[kw];
+    const ready = isKeywordReady(kw);
+    const days = daysUntilReady(kw);
+    const pct = Math.round(((data.clients || 0) / maxClients) * 100);
+    const lastUsed = data.lastUsed ? new Date(data.lastUsed).toLocaleDateString('en-US', { month:'short', day:'numeric' }) : 'Never';
+    const rank = i === 0 && (data.clients || 0) > 0 ? ' 🏆' : '';
+    return `<div class="kw-card">
+      <div class="kw-card-top">
+        <div class="kw-name">${kw}${rank}</div>
+        <div class="kw-badge ${ready ? 'ready' : 'cooldown'}">${ready ? 'Ready' : `${days}d left`}</div>
+      </div>
+      <div class="kw-stats">
+        <div class="kw-stat"><strong>${data.clients || 0}</strong>Clients Found</div>
+        <div class="kw-stat"><strong>${data.uses || 0}</strong>Times Used</div>
+        <div class="kw-stat"><strong>${lastUsed}</strong>Last Used</div>
+      </div>
+      <div class="kw-bar-wrap"><div class="kw-bar" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+// ─── PER-KW COOLDOWN ──────────────────────────────────────
+function renderPerKwCooldown() {
+  const wrap = document.getElementById('per-kw-cooldown');
+  const keywords = Object.keys(state.keywords);
+  if (!keywords.length) {
+    wrap.innerHTML = '<div class="empty" style="padding:20px 0">No keywords yet</div>';
+    return;
+  }
+  wrap.innerHTML = keywords.map(kw => `
+    <div class="cooldown-setting">
+      <label>${kw}</label>
+      <input type="number" min="1" max="30" value="${state.keywords[kw].cooldownDays || state.defaultCooldown}"
+        onchange="updateKwCooldown('${kw}', this.value)">
+    </div>
+  `).join('');
+}
+
+function updateKwCooldown(kw, val) {
+  if (state.keywords[kw]) {
+    state.keywords[kw].cooldownDays = parseInt(val);
+    saveState();
+  }
+}
+
+// ─── SETTINGS ─────────────────────────────────────────────
+function saveCooldown() {
+  state.defaultCooldown = parseInt(document.getElementById('default-cooldown').value) || 3;
+  saveState();
+  showToast('Cooldown saved');
+}
+
+function saveSettings() {
+  state.token = document.getElementById('notion-token').value.trim() || DEFAULT_TOKEN;
+  state.dbId = document.getElementById('notion-db').value.trim() || DEFAULT_DB_ID;
+  state.defaultCooldown = parseInt(document.getElementById('default-cooldown').value) || 3;
+  saveState();
+  showToast('Settings saved');
+}
+
+// ─── TOAST ────────────────────────────────────────────────
+function showToast(msg, error = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (error ? ' error' : '');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ─── ENTER KEY ────────────────────────────────────────────
+document.getElementById('keyword-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); addKeywordFromInput(); }
+});
+</script>
+</body>
+</html>
