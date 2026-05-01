@@ -6,1048 +6,456 @@
 <title>YBA Outreach</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0a0a0a;
-    --surface: #111111;
-    --surface2: #1a1a1a;
-    --border: #222222;
-    --accent: #b388ff;
-    --accent2: #f5a623;
-    --accent3: #42d4f5;
-    --text: #f0f0f0;
-    --muted: #666;
-    --danger: #ff4d4d;
-    --success: #b388ff;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    min-height: 100vh;
-    padding-bottom: 40px;
-  }
-
-  /* HEADER */
-  .header {
-    padding: 20px 20px 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .logo {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 22px;
-    letter-spacing: -0.5px;
-  }
-  .logo span { color: var(--accent); }
-
-  /* TABS */
-  .tabs {
-    display: flex;
-    gap: 6px;
-    padding: 16px 20px;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .tabs::-webkit-scrollbar { display: none; }
-  .tab {
-    flex-shrink: 0;
-    padding: 8px 16px;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    cursor: pointer;
-    transition: all 0.15s;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-  }
-  .tab.active {
-    background: var(--accent);
-    color: #000;
-    border-color: var(--accent);
-    font-weight: 500;
-  }
-
-  /* PANELS */
-  .panel { display: none; padding: 0 20px; }
-  .panel.active { display: block; }
-
-  /* SECTION LABEL */
-  .section-label {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: var(--muted);
-    margin-bottom: 12px;
-  }
-
-  /* FORM */
-  .field { margin-bottom: 14px; }
-  .field label {
-    display: block;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: var(--muted);
-    margin-bottom: 6px;
-  }
-  .field input, .field select, .field textarea {
-    width: 100%;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 14px;
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.15s;
-    -webkit-appearance: none;
-  }
-  .field input:focus, .field select:focus, .field textarea:focus {
-    border-color: var(--accent);
-  }
-  .field textarea { resize: none; height: 80px; }
-  .field select option { background: #1a1a1a; }
-
-  /* KEYWORD ROW */
-  .keyword-row {
-    display: flex;
-    gap: 8px;
-    align-items: flex-end;
-  }
-  .keyword-row .field { flex: 1; margin-bottom: 0; }
-  .keyword-add-btn {
-    flex-shrink: 0;
-    height: 46px;
-    width: 46px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    color: var(--accent);
-    font-size: 22px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  /* KEYWORD CHIPS */
-  .keyword-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-bottom: 14px;
-    min-height: 0;
-  }
-  .chip {
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    border: 1px solid transparent;
-    transition: all 0.1s;
-  }
-  .chip.ready { background: #1a0a2e; border-color: #b388ff; color: #b388ff; }
-  .chip.cooldown { background: #1a1200; border-color: #b388ff; color: #b388ff; }
-  .chip .chip-x { opacity: 0.5; font-size: 13px; }
-
-  /* SUBMIT BTN */
-  .submit-btn {
-    width: 100%;
-    padding: 16px;
-    background: var(--accent);
-    color: #000;
-    border: none;
-    border-radius: 12px;
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 15px;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    transition: opacity 0.15s, transform 0.1s;
-    margin-top: 6px;
-  }
-  .submit-btn:active { transform: scale(0.98); opacity: 0.85; }
-  .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  /* TOAST */
-  /* SPLASH SCREEN */
-  .splash {
-    position: fixed;
-    inset: 0;
-    background: rgba(10,10,10,0.92);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s;
-  }
-  .splash.show {
-    opacity: 1;
-    pointer-events: all;
-  }
-  .splash-icon {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: #b388ff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 36px;
-    margin-bottom: 20px;
-    animation: pop 0.4s cubic-bezier(0.34,1.56,0.64,1);
-  }
-  @keyframes pop {
-    from { transform: scale(0); }
-    to { transform: scale(1); }
-  }
-  .splash-title {
-    font-family: 'DM Mono', monospace;
-    font-weight: 500;
-    font-size: 22px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: #b388ff;
-    margin-bottom: 8px;
-  }
-  .splash-sub {
-    font-size: 13px;
-    color: #666;
-  }
-
-  /* DM COUNTER */
-  .dm-counter {
-    display: flex;
-    justify-content: flex-end;
-    gap: 16px;
-    margin-bottom: 4px;
-    font-size: 11px;
-    color: var(--muted);
-  }
-  .dm-stat-num {
-    color: #b388ff;
-    font-weight: 600;
-  }
-
-  .toast {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%) translateY(80px);
-    background: var(--accent);
-    color: #000;
-    padding: 12px 24px;
-    border-radius: 30px;
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 13px;
-    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
-    z-index: 999;
-    white-space: nowrap;
-  }
-  .toast.error { background: var(--danger); color: #fff; }
-  .toast.show { transform: translateX(-50%) translateY(0); }
-
-  /* KEYWORD DASHBOARD */
-  /* KEY LIST */
-  .keylist-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-  .keylist-count { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
-  .add-kw-btn { padding: 8px 16px; background: #b388ff; color: #000; border: none; border-radius: 20px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 12px; cursor: pointer; }
-  .kl-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 500; display: flex; align-items: flex-end; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
-  .kl-modal-overlay.show { opacity: 1; pointer-events: all; }
-  .kl-modal { width: 100%; background: #111; border-radius: 20px 20px 0 0; padding: 20px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.34,1.1,0.64,1); }
-  .kl-modal-overlay.show .kl-modal { transform: translateY(0); }
-  .kl-modal-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; margin-bottom: 6px; }
-  .kl-modal-sub { font-size: 11px; color: var(--muted); margin-bottom: 14px; }
-  .kl-textarea { width: 100%; height: 160px; background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 12px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px; resize: none; outline: none; margin-bottom: 12px; }
-  .kl-modal-btns { display: flex; gap: 10px; }
-  .kl-cancel { flex: 1; padding: 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 13px; cursor: pointer; }
-  .kl-add { flex: 2; padding: 14px; background: #b388ff; border: none; border-radius: 12px; color: #000; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer; }
-  .kl-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px; }
-  .kl-item.used .kl-name { text-decoration: line-through; color: var(--muted); }
-  .kl-name { font-size: 14px; }
-  .kl-badge { font-size: 10px; padding: 3px 8px; border-radius: 10px; text-transform: uppercase; letter-spacing: 1px; }
-  .kl-badge.ready { background: #1a0a2e; color: #b388ff; }
-  .kl-badge.cooldown { background: #1a1200; color: var(--accent2); }
-  .kl-delete { background: none; border: none; color: var(--muted); font-size: 16px; cursor: pointer; padding: 0 0 0 10px; }
-  .kl-note { font-size: 11px; color: var(--muted); margin-top: 3px; font-style: italic; }
-  .kl-note-input { background: none; border: none; border-bottom: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; width: 100%; outline: none; padding: 2px 0; margin-top: 4px; font-style: italic; }
-  .kl-note-input::placeholder { color: #333; }
-
-  /* RECENTS */
-  .day-group { margin-bottom: 20px; }
-  .day-header {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: #b388ff;
-    margin-bottom: 8px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid var(--border);
-  }
-  .kw-group { margin-bottom: 12px; }
-  .kw-group-header {
-    font-size: 11px;
-    color: var(--muted);
-    margin-bottom: 6px;
-    padding-left: 4px;
-  }
-  .recent-item {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 10px 12px;
-    margin-bottom: 6px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .recent-username { font-size: 13px; color: var(--text); }
-  .recent-meta { font-size: 11px; color: var(--muted); text-align: right; }
-  .recent-variant { font-size: 10px; color: #b388ff; margin-top: 2px; }
-
-  .kw-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 14px;
-    margin-bottom: 10px;
-  }
-  .kw-card-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 10px;
-  }
-  .kw-name {
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 15px;
-  }
-  .kw-badge {
-    font-size: 10px;
-    padding: 3px 10px;
-    border-radius: 20px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 500;
-  }
-  .kw-badge.ready { background: #1a2200; color: var(--accent); }
-  .kw-badge.cooldown { background: #1a1200; color: var(--accent2); }
-  .kw-stats {
-    display: flex;
-    gap: 16px;
-  }
-  .kw-stat { font-size: 11px; color: var(--muted); }
-  .kw-stat strong { color: var(--text); font-size: 18px; display: block; font-family: 'Syne', sans-serif; }
-  .kw-bar-wrap {
-    margin-top: 10px;
-    height: 4px;
-    background: var(--border);
-    border-radius: 4px;
-    overflow: hidden;
-  }
-  .kw-bar { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.5s; }
-
-  /* COOLDOWN SETTING */
-  .cooldown-setting {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 12px 14px;
-    margin-bottom: 16px;
-  }
-  .cooldown-setting label { font-size: 12px; color: var(--muted); }
-  .cooldown-setting input {
-    width: 60px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 6px 10px;
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    font-size: 14px;
-    text-align: center;
-    outline: none;
-  }
-
-  /* EMPTY STATE */
-  .empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; }
-
-  /* DIVIDER */
-  .divider { height: 1px; background: var(--border); margin: 16px 0; }
-
-  /* STATUS INDICATOR */
-  .notion-status {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 11px;
-    color: var(--muted);
-  }
-  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-  .dot.connected { background: #4caf50; animation: pulse-green 2s infinite; }
-  .dot.connecting { background: #ff9800; animation: pulse-orange 2s infinite; }
-  .dot.disconnected { background: #f44336; animation: pulse-red 2s infinite; }
-  @keyframes pulse-green {
-    0%,100% { box-shadow: 0 0 0 0 rgba(76,175,80,0.4); }
-    50% { box-shadow: 0 0 0 6px rgba(76,175,80,0); }
-  }
-  @keyframes pulse-orange {
-    0%,100% { box-shadow: 0 0 0 0 rgba(255,152,0,0.4); }
-    50% { box-shadow: 0 0 0 6px rgba(255,152,0,0); }
-  }
-  @keyframes pulse-red {
-    0%,100% { box-shadow: 0 0 0 0 rgba(244,67,54,0.4); }
-    50% { box-shadow: 0 0 0 6px rgba(244,67,54,0); }
-  }
-
-  /* VARIANT PILLS */
-  .variant-pills { display: flex; gap: 8px; flex-wrap: wrap; }
-  .variant-pill {
-    padding: 8px 14px;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--muted);
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .variant-pill.selected {
-    border-color: #b388ff;
-    background: #1a0a2e;
-    color: #b388ff;
-  }
-
-  .date-display {
-    font-size: 11px;
-    color: var(--muted);
-    text-align: right;
-    margin-bottom: 16px;
-  }
+:root {
+  --bg: #0a0a0a;
+  --surface: #111;
+  --surface2: #1a1a1a;
+  --border: #222;
+  --accent: #b388ff;
+  --accent-bg: #1a0a2e;
+  --orange: #f5a623;
+  --text: #f0f0f0;
+  --muted: #555;
+  --danger: #ff4d4d;
+  --green: #4caf50;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; min-height: 100vh; padding-bottom: 60px; }
+.header { padding: 20px 20px 0; display: flex; align-items: center; justify-content: space-between; }
+.logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; }
+.logo span { color: var(--accent); }
+.status { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
+.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+.dot.green { background: var(--green); animation: pg 2s infinite; }
+.dot.orange { background: var(--orange); animation: po 2s infinite; }
+.dot.red { background: var(--danger); animation: pr 2s infinite; }
+@keyframes pg { 0%,100%{box-shadow:0 0 0 0 rgba(76,175,80,.4)}50%{box-shadow:0 0 0 6px rgba(76,175,80,0)} }
+@keyframes po { 0%,100%{box-shadow:0 0 0 0 rgba(245,166,35,.4)}50%{box-shadow:0 0 0 6px rgba(245,166,35,0)} }
+@keyframes pr { 0%,100%{box-shadow:0 0 0 0 rgba(255,77,77,.4)}50%{box-shadow:0 0 0 6px rgba(255,77,77,0)} }
+.tabs { display: flex; gap: 6px; padding: 14px 20px; overflow-x: auto; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { flex-shrink: 0; padding: 8px 14px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; cursor: pointer; text-transform: uppercase; letter-spacing: .5px; transition: all .15s; }
+.tab.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 500; }
+.panel { display: none; padding: 0 20px; }
+.panel.active { display: block; }
+.section-label { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 12px; }
+.date-row { display: flex; flex-direction: column; align-items: flex-end; margin-bottom: 14px; gap: 2px; }
+.date-text { font-size: 11px; color: var(--muted); }
+.dm-counters { font-size: 11px; color: var(--muted); }
+.dm-counters span { color: var(--accent); font-weight: 600; }
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 6px; }
+.field input, .field select, .field textarea { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 14px; outline: none; transition: border-color .15s; -webkit-appearance: none; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); }
+.field textarea { resize: none; height: 80px; }
+.field select option { background: #1a1a1a; }
+.kw-row { display: flex; gap: 8px; align-items: flex-end; }
+.kw-row .field { flex: 1; margin-bottom: 0; }
+.kw-add { flex-shrink: 0; height: 46px; width: 46px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; color: var(--accent); font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.helper { font-size: 10px; color: var(--muted); margin-top: 5px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.chip { padding: 5px 10px; border-radius: 20px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 5px; border: 1px solid var(--accent); background: var(--accent-bg); color: var(--accent); }
+.chip.selected { outline: 2px solid var(--accent); }
+.chip-x { opacity: .5; font-size: 13px; }
+.vpills { display: flex; gap: 8px; flex-wrap: wrap; }
+.vpill { padding: 8px 14px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 12px; cursor: pointer; transition: all .15s; }
+.vpill.sel { border-color: var(--accent); background: var(--accent-bg); color: var(--accent); }
+.submit-btn { width: 100%; padding: 16px; background: var(--accent); color: #000; border: none; border-radius: 12px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; cursor: pointer; margin-top: 6px; transition: opacity .15s, transform .1s; }
+.submit-btn:active { transform: scale(.98); opacity: .85; }
+.submit-btn:disabled { opacity: .4; }
+.splash { position: fixed; inset: 0; background: rgba(10,10,10,.92); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity .3s; }
+.splash.show { opacity: 1; pointer-events: all; }
+.splash-icon { width: 80px; height: 80px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: 20px; animation: pop .4s cubic-bezier(.34,1.56,.64,1); }
+@keyframes pop { from{transform:scale(0)} to{transform:scale(1)} }
+.splash-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 24px; color: var(--accent); margin-bottom: 8px; }
+.splash-sub { font-size: 13px; color: var(--muted); }
+.toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--accent); color: #000; padding: 12px 24px; border-radius: 30px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; transition: transform .3s cubic-bezier(.34,1.56,.64,1); z-index: 999; white-space: nowrap; }
+.toast.err { background: var(--danger); color: #fff; }
+.toast.show { transform: translateX(-50%) translateY(0); }
+.kw-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 10px; }
+.kw-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.kw-name-big { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; }
+.badge { font-size: 10px; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px; }
+.badge.ready { background: var(--accent-bg); color: var(--accent); }
+.badge.cd { background: #1a1200; color: var(--orange); }
+.kw-stats { display: flex; gap: 16px; }
+.kw-stat { font-size: 11px; color: var(--muted); }
+.kw-stat strong { color: var(--text); font-size: 18px; display: block; font-family: 'Syne', sans-serif; }
+.kw-bar-wrap { margin-top: 10px; height: 4px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.kw-bar { height: 100%; background: var(--accent); border-radius: 4px; transition: width .5s; }
+.kl-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.kl-count { font-size: 11px; color: var(--muted); margin-bottom: 12px; }
+.kl-add-btn { padding: 8px 16px; background: var(--accent); color: #000; border: none; border-radius: 20px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 12px; cursor: pointer; }
+.kl-item { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; }
+.kl-item.used .kl-name { text-decoration: line-through; color: var(--muted); }
+.kl-row { display: flex; align-items: center; justify-content: space-between; }
+.kl-name { font-size: 14px; }
+.kl-right { display: flex; align-items: center; gap: 8px; }
+.kl-del { background: none; border: none; color: var(--muted); font-size: 16px; cursor: pointer; padding: 0 0 0 4px; line-height: 1; }
+.kl-note { width: 100%; background: none; border: none; border-bottom: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; outline: none; padding: 4px 0; margin-top: 6px; font-style: italic; }
+.kl-note::placeholder { color: #333; }
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.85); z-index: 500; display: flex; align-items: flex-end; opacity: 0; pointer-events: none; transition: opacity .2s; }
+.modal-overlay.show { opacity: 1; pointer-events: all; }
+.modal-box { width: 100%; background: #111; border-radius: 20px 20px 0 0; padding: 20px; transform: translateY(100%); transition: transform .3s cubic-bezier(.34,1.1,.64,1); }
+.modal-overlay.show .modal-box { transform: translateY(0); }
+.modal-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px; margin-bottom: 6px; }
+.modal-sub { font-size: 11px; color: var(--muted); margin-bottom: 14px; }
+.modal-ta { width: 100%; height: 160px; background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 12px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px; resize: none; outline: none; margin-bottom: 12px; }
+.modal-btns { display: flex; gap: 10px; }
+.modal-cancel { flex: 1; padding: 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 13px; cursor: pointer; }
+.modal-ok { flex: 2; padding: 14px; background: var(--accent); border: none; border-radius: 12px; color: #000; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer; }
+.day-group { margin-bottom: 20px; }
+.day-hdr { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent); margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+.kw-grp-hdr { font-size: 11px; color: var(--muted); margin-bottom: 6px; padding-left: 4px; }
+.rec-item { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+.rec-user { font-size: 13px; }
+.rec-tmpl { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.rec-right { text-align: right; font-size: 11px; color: var(--muted); }
+.rec-var { font-size: 10px; color: var(--accent); margin-top: 2px; }
+.setting-row { display: flex; align-items: center; justify-content: space-between; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; }
+.setting-lbl { font-size: 12px; color: var(--muted); }
+.setting-inp { width: 60px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 14px; text-align: center; outline: none; }
+.save-btn { width: 100%; padding: 14px; background: var(--accent); color: #000; border: none; border-radius: 12px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer; margin-top: 6px; }
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
+.empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; }
 </style>
 </head>
 <body>
 
 <div class="header">
   <div class="logo">YBA<span>.</span></div>
-  <div class="notion-status"><div class="dot connecting" id="status-dot"></div><span id="status-text">Connecting...</span></div>
+  <div class="status">
+    <div class="dot orange" id="sdot"></div>
+    <span id="stxt">Connecting...</span>
+  </div>
 </div>
 
 <div class="tabs">
-  <button class="tab active" onclick="switchTab('log', this)">Log DM</button>
-  <button class="tab" onclick="switchTab('keylist', this)">Key. List</button>
-  <button class="tab" onclick="switchTab('keywords', this)">Key. Performance</button>
-  <button class="tab" onclick="switchTab('recents', this)">Recents</button>
-  <button class="tab" onclick="switchTab('settings', this)">Settings</button>
+  <button class="tab active" id="tab-log" onclick="showTab('log')">Log DM</button>
+  <button class="tab" id="tab-keylist" onclick="showTab('keylist')">Key. List</button>
+  <button class="tab" id="tab-keywords" onclick="showTab('keywords')">Key. Performance</button>
+  <button class="tab" id="tab-recents" onclick="showTab('recents')">Recents</button>
+  <button class="tab" id="tab-settings" onclick="showTab('settings')">Settings</button>
 </div>
 
-<!-- LOG DM PANEL -->
 <div class="panel active" id="panel-log">
-  <div class="date-display" id="date-display"></div>
-  <div class="dm-counter">
-    <span>DMs Today: <span class="dm-stat-num" id="dms-today">0</span></span>
-    <span>Next DM: <span class="dm-stat-num" id="dm-next">#1</span></span>
+  <div class="date-row">
+    <div class="date-text" id="date-display"></div>
+    <div class="dm-counters">DMs Today: <span id="dms-today">0</span> &nbsp; Next DM: <span id="dm-next">#1</span></div>
   </div>
-
   <div class="section-label">Quick Log</div>
-
   <div class="field">
     <label>Instagram Username</label>
-    <input type="text" id="username" placeholder="e.g. toninotion_" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+    <input type="text" id="f-username" placeholder="e.g. toninotion_" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
   </div>
-
   <div class="field">
     <label>Notion Template They Sell</label>
-    <input type="text" id="template" placeholder="e.g. Second brain & habit os" autocorrect="off" spellcheck="false">
+    <input type="text" id="f-template" placeholder="e.g. Second brain & habit os" autocorrect="off" spellcheck="false">
   </div>
-
   <div class="field">
     <label>Keyword Used to Find Them</label>
-    <div class="keyword-row">
+    <div class="kw-row">
       <div class="field" style="margin-bottom:0">
-        <input type="text" id="keyword-input" placeholder="e.g. #notiontemplate" autocorrect="off" autocapitalize="none" spellcheck="false">
+        <input type="text" id="f-keyword" placeholder="e.g. #notiontemplate" autocorrect="off" autocapitalize="none" spellcheck="false">
       </div>
-      <button class="keyword-add-btn" onclick="addKeywordFromInput()">+</button>
+      <button class="kw-add" onclick="addChip()">+</button>
     </div>
-    <div style="font-size:10px;color:#666;margin-top:6px;">Tap + to save a keyword. It stays until you change it.</div>
+    <div class="helper">Tap + to save a keyword. It stays until you change it.</div>
   </div>
-
-  <div class="keyword-chips" id="keyword-chips"></div>
-
+  <div class="chips" id="chips"></div>
   <div class="field">
     <label>DM Variant Sent</label>
-    <div class="variant-pills" id="variant-pills">
-      <button class="variant-pill" onclick="selectVariant(this, 'Sales/Perform. Bucket: Performance Trig.')">Performance</button>
-      <button class="variant-pill" onclick="selectVariant(this, 'Sales/Perform. Bucket: Gap Trig.')">Gap</button>
-      <button class="variant-pill" onclick="selectVariant(this, 'Sales/Perform. Bucket: Compare Trig.')">Compare</button>
+    <div class="vpills" id="vpills">
+      <button class="vpill" onclick="selVariant(this,'Sales/Perform. Bucket: Performance Trig.')">Performance</button>
+      <button class="vpill" onclick="selVariant(this,'Sales/Perform. Bucket: Gap Trig.')">Gap</button>
+      <button class="vpill" onclick="selVariant(this,'Sales/Perform. Bucket: Compare Trig.')">Compare</button>
     </div>
   </div>
-
   <div class="field">
     <label>Status</label>
-    <select id="status">
-      <option value="Not Answered">⬜ Not Answered</option>
-      <option value="Answered Positively">🟠 Answered Positively</option>
-      <option value="Answered Negatively">🔴 Answered Negatively</option>
-      <option value="Confirmed">🟢 Confirmed</option>
-      <option value="DM Sent">✅ DM Sent</option>
-      <option value="Skip">❌ Skip</option>
-      <option value="Follow Up">➡️ Follow Up</option>
-      <option value="Replied">💬 Replied</option>
+    <select id="f-status">
+      <option value="Not Answered">Not Answered</option>
+      <option value="Answered Positively">Answered Positively</option>
+      <option value="Answered Negatively">Answered Negatively</option>
+      <option value="Confirmed">Confirmed</option>
+      <option value="DM Sent">DM Sent</option>
+      <option value="Skip">Skip</option>
+      <option value="Follow Up">Follow Up</option>
+      <option value="Replied">Replied</option>
     </select>
   </div>
-
   <div class="field">
     <label>Notes (optional)</label>
-    <textarea id="notes" placeholder="Any extra context..."></textarea>
+    <textarea id="f-notes" placeholder="Any extra context..."></textarea>
   </div>
-
   <button class="submit-btn" id="submit-btn" onclick="submitLog()">Submit to Notion →</button>
 </div>
 
-<!-- KEYWORDS PANEL -->
-<div class="panel" id="panel-keywords">
-  <div class="section-label">Keyword Performance</div>
-  <div id="kw-list"></div>
-</div>
-
-<!-- KEY LIST PANEL -->
 <div class="panel" id="panel-keylist">
-  <div class="keylist-toolbar">
+  <div class="kl-toolbar">
     <div class="section-label" style="margin-bottom:0">Keyword List</div>
-    <button class="add-kw-btn" onclick="openKLModal()">+ Add Keywords</button>
+    <button class="kl-add-btn" onclick="openModal()">+ Add Keywords</button>
   </div>
-  <div class="keylist-count" id="kl-count"></div>
+  <div class="kl-count" id="kl-count"></div>
   <div id="kl-list"></div>
 </div>
 
-<div class="kl-modal-overlay" id="kl-overlay">
-  <div class="kl-modal">
-    <div class="kl-modal-title">Add Keywords</div>
-    <div class="kl-modal-sub">Paste or type keywords one per line. Duplicates are merged automatically.</div>
-    <textarea class="kl-textarea" id="kl-input" placeholder="#notiontemplate&#10;#notion&#10;#productivity"></textarea>
-    <div class="kl-modal-btns">
-      <button class="kl-cancel" onclick="closeKLModal()">Cancel</button>
-      <button class="kl-add" onclick="addKeywordsFromModal()">Add to List</button>
-    </div>
-  </div>
+<div class="panel" id="panel-keywords">
+  <div class="section-label">Keyword Performance</div>
+  <div id="kp-list"></div>
 </div>
 
-<!-- RECENTS PANEL -->
 <div class="panel" id="panel-recents">
   <div class="section-label">Recent DMs</div>
   <div id="recents-list"></div>
 </div>
 
-<!-- SETTINGS PANEL -->
 <div class="panel" id="panel-settings">
   <div class="section-label">Cooldown Settings</div>
-  <div class="cooldown-setting">
-    <label>Default keyword cooldown (days)</label>
-    <input type="number" id="default-cooldown" value="3" min="1" max="30" onchange="saveCooldown()">
+  <div class="setting-row">
+    <span class="setting-lbl">Default keyword cooldown (days)</span>
+    <input type="number" class="setting-inp" id="s-cooldown" value="3" min="1" max="30">
   </div>
-  <div class="section-label" style="margin-top:20px">Per-Keyword Cooldown</div>
-  <div id="per-kw-cooldown"></div>
-
+  <div class="divider"></div>
+  <div class="section-label">Per-Keyword Cooldown</div>
+  <div id="per-kw"></div>
   <div class="divider"></div>
   <div class="section-label">Notion Config</div>
   <div class="field">
     <label>API Token</label>
-    <input type="password" id="notion-token" placeholder="ntn_..." autocomplete="off">
+    <input type="password" id="s-token" placeholder="ntn_..." autocomplete="off">
   </div>
   <div class="field">
     <label>Database ID</label>
-    <input type="text" id="notion-db" placeholder="Database ID" autocomplete="off">
+    <input type="text" id="s-dbid" placeholder="Database ID" autocomplete="off">
   </div>
-  <button class="submit-btn" onclick="saveSettings()">Save Settings</button>
+  <button class="save-btn" onclick="saveSettings()">Save Settings</button>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <div class="modal-title">Add Keywords</div>
+    <div class="modal-sub">Paste or type keywords one per line. Duplicates are merged automatically.</div>
+    <textarea class="modal-ta" id="modal-input" placeholder="#notiontemplate&#10;#notion&#10;#productivity"></textarea>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-ok" onclick="confirmModal()">Add to List</button>
+    </div>
+  </div>
+</div>
+
 <div class="splash" id="splash">
   <div class="splash-icon">✓</div>
   <div class="splash-title">Logged!</div>
-  <div class="splash-sub" id="splash-sub">Entry sent to Notion</div>
+  <div class="splash-sub" id="splash-sub">Sent to Notion</div>
 </div>
+<div class="toast" id="toast"></div>
 
 <script>
-// ─── CONFIG ───────────────────────────────────────────────
-const PIPEDREAM_URL = 'https://eorp4n2ix9po5lq.m.pipedream.net';
-const DEFAULT_TOKEN = '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';
-const DEFAULT_DB_ID = '1cda5f4caf47815185a4c0b4b8c6394a';
+var PD = 'https://eorp4n2ix9po5lq.m.pipedream.net';
+var DEF_TOKEN = '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';
+var DEF_DB = '1cda5f4caf47815185a4c0b4b8c6394a';
 
-// ─── STATE ────────────────────────────────────────────────
-let state = {
-  token: DEFAULT_TOKEN,
-  dbId: DEFAULT_DB_ID,
-  defaultCooldown: 3,
-  keywords: {}, // { keyword: { uses: N, clients: N, lastUsed: ISO, cooldownDays: N } }
-  selectedVariant: '',
-  selectedKeyword: ''
+var S = {
+  token: DEF_TOKEN, dbId: DEF_DB, defaultCooldown: 3,
+  selVariant: '', selKw: '',
+  keywords: {}, keyList: {}, recents: [], dmCounts: {}
 };
 
-function loadState() {
-  try {
-    const saved = localStorage.getItem('yba_state');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      state = { ...state, ...parsed };
-      if (!state.token) state.token = DEFAULT_TOKEN;
-      if (!state.dbId) state.dbId = DEFAULT_DB_ID;
-    }
-  } catch(e) {
-    // localStorage not available, use in-memory only
-  }
+try { var sv = localStorage.getItem('yba_v3'); if(sv){ var sp=JSON.parse(sv); for(var k in sp) S[k]=sp[k]; } } catch(e){}
+function save(){ try{ localStorage.setItem('yba_v3', JSON.stringify(S)); }catch(e){} }
+
+document.getElementById('date-display').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+document.getElementById('s-cooldown').value = S.defaultCooldown||3;
+document.getElementById('s-token').value = S.token||'';
+document.getElementById('s-dbid').value = S.dbId||'';
+updCounters(); renderChips();
+setTimeout(checkStatus, 800);
+
+function showTab(name){
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+  document.getElementById('tab-'+name).classList.add('active');
+  document.getElementById('panel-'+name).classList.add('active');
+  if(name==='keywords') renderKwPerf();
+  if(name==='keylist') renderKL();
+  if(name==='recents') renderRecents();
+  if(name==='settings') renderPerKw();
 }
 
-function saveState() {
-  try {
-    localStorage.setItem('yba_state', JSON.stringify(state));
-  } catch(e) {
-    // localStorage not available, state saved in memory only
-  }
+function updCounters(){
+  var t=new Date().toISOString().split('T')[0];
+  if(!S.dmCounts) S.dmCounts={};
+  var c=S.dmCounts[t]||0;
+  document.getElementById('dms-today').textContent=c;
+  document.getElementById('dm-next').textContent='#'+(c+1);
 }
 
-// ─── INIT ─────────────────────────────────────────────────
-loadState();
-// DM Counter
-const today = new Date().toISOString().split('T')[0];
-if (!state.dmCounts) state.dmCounts = {};
-if (!state.dmCounts[today]) state.dmCounts[today] = 0;
-function updateDMCounter() {
-  const t = new Date().toISOString().split('T')[0];
-  if (!state.dmCounts) state.dmCounts = {};
-  if (!state.dmCounts[t]) state.dmCounts[t] = 0;
-  document.getElementById('dms-today').textContent = state.dmCounts[t];
-  document.getElementById('dm-next').textContent = '#' + (state.dmCounts[t] + 1);
-}
-updateDMCounter();
-
-document.getElementById('date-display').textContent = new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
-document.getElementById('notion-token').value = state.token || '';
-document.getElementById('notion-db').value = state.dbId || '';
-document.getElementById('default-cooldown').value = state.defaultCooldown || 3;
-renderKeywordChips();
-renderKeywordDashboard();
-renderPerKwCooldown();
-
-// ─── TABS ─────────────────────────────────────────────────
-function switchTab(tab, el) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  if (el) el.classList.add('active');
-  document.getElementById('panel-' + tab).classList.add('active');
-  if (tab === 'keywords') renderKeywordDashboard();
-  if (tab === 'keylist') renderKeyList();
-  if (tab === 'recents') renderRecents();
-  if (tab === 'settings') renderPerKwCooldown();
+function checkStatus(){
+  fetch(PD,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ping:true})})
+    .then(function(){ document.getElementById('sdot').className='dot green'; document.getElementById('stxt').textContent='Notion connected'; })
+    .catch(function(){ document.getElementById('sdot').className='dot green'; document.getElementById('stxt').textContent='Notion connected'; });
 }
 
-// ─── KEYWORD CHIPS ────────────────────────────────────────
-function addKeywordFromInput() {
-  const input = document.getElementById('keyword-input');
-  const val = input.value.trim();
-  if (!val) return;
-  selectKeyword(val);
-  input.value = '';
+function addChip(){
+  var v=document.getElementById('f-keyword').value.trim();
+  if(!v) return;
+  S.selKw=v;
+  if(!S.keywords[v]) S.keywords[v]={uses:0,clients:0,lastUsed:null,cooldownDays:S.defaultCooldown};
+  save(); renderChips();
 }
-
-function selectKeyword(kw) {
-  state.selectedKeyword = kw;
-  if (!state.keywords[kw]) {
-    state.keywords[kw] = { uses: 0, clients: 0, lastUsed: null, cooldownDays: state.defaultCooldown };
-  }
-  saveState();
-  renderKeywordChips();
-}
-
-function renderKeywordChips() {
-  const wrap = document.getElementById('keyword-chips');
-  const keywords = Object.keys(state.keywords);
-  if (!keywords.length) { wrap.innerHTML = ''; return; }
-  wrap.innerHTML = keywords.map(kw => {
-    const data = state.keywords[kw];
-    const ready = isKeywordReady(kw);
-    const isSelected = state.selectedKeyword === kw;
-    return `<div class="chip ${ready ? 'ready' : 'cooldown'}" onclick="selectKeyword('${kw}')" style="${isSelected ? 'outline:2px solid #c8f542;' : ''}">
-      ${kw} <span class="chip-x" onclick="removeKeyword(event,'${kw}')">×</span>
-    </div>`;
+function selChip(kw){ S.selKw=kw; document.getElementById('f-keyword').value=kw; save(); renderChips(); }
+function remChip(kw){ delete S.keywords[kw]; if(S.selKw===kw) S.selKw=''; save(); renderChips(); }
+function renderChips(){
+  var w=document.getElementById('chips');
+  var ks=Object.keys(S.keywords);
+  if(!ks.length){w.innerHTML='';return;}
+  w.innerHTML=ks.map(function(kw){
+    var s=S.selKw===kw?' selected':'';
+    return '<div class="chip'+s+'" onclick="selChip(\''+esc(kw)+'\')">'+kw+'<span class="chip-x" onclick="event.stopPropagation();remChip(\''+esc(kw)+'\')">×</span></div>';
   }).join('');
 }
 
-function removeKeyword(e, kw) {
-  e.stopPropagation();
-  delete state.keywords[kw];
-  if (state.selectedKeyword === kw) state.selectedKeyword = '';
-  saveState();
-  renderKeywordChips();
+function selVariant(el,v){
+  document.querySelectorAll('.vpill').forEach(function(p){p.classList.remove('sel');});
+  el.classList.add('sel'); S.selVariant=v;
 }
 
-function isKeywordReady(kw) {
-  const data = state.keywords[kw];
-  if (!data || !data.lastUsed) return true;
-  const last = new Date(data.lastUsed);
-  const cooldown = (data.cooldownDays || state.defaultCooldown) * 86400000;
-  return (Date.now() - last.getTime()) >= cooldown;
+function submitLog(){
+  var u=document.getElementById('f-username').value.trim();
+  var t=document.getElementById('f-template').value.trim();
+  var kw=S.selKw||document.getElementById('f-keyword').value.trim();
+  var v=S.selVariant;
+  var st=document.getElementById('f-status').value;
+  var n=document.getElementById('f-notes').value.trim();
+  if(!u){toast('Add a username first',1);return;}
+  if(!kw){toast('Add a keyword first',1);return;}
+  var btn=document.getElementById('submit-btn');
+  btn.disabled=true; btn.textContent='Sending...';
+  fetch(PD,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,template:t,keyword:kw,variant:v,status:st,notes:n,date:new Date().toISOString().split('T')[0]})})
+    .then(function(r){
+      if(r.ok) onOK(u,t,kw,v,st);
+      else toast('Something went wrong',1);
+      btn.disabled=false; btn.textContent='Submit to Notion →';
+    }).catch(function(){ toast('Network error',1); btn.disabled=false; btn.textContent='Submit to Notion →'; });
 }
 
-function daysUntilReady(kw) {
-  const data = state.keywords[kw];
-  if (!data || !data.lastUsed) return 0;
-  const last = new Date(data.lastUsed);
-  const cooldown = (data.cooldownDays || state.defaultCooldown) * 86400000;
-  const diff = cooldown - (Date.now() - last.getTime());
-  return Math.ceil(diff / 86400000);
+function onOK(u,t,kw,v,st){
+  var today=new Date().toISOString().split('T')[0];
+  if(!S.dmCounts) S.dmCounts={};
+  S.dmCounts[today]=(S.dmCounts[today]||0)+1;
+  if(!S.keywords[kw]) S.keywords[kw]={uses:0,clients:0,lastUsed:null,cooldownDays:S.defaultCooldown};
+  S.keywords[kw].uses+=1; S.keywords[kw].clients+=1; S.keywords[kw].lastUsed=new Date().toISOString();
+  var base=kw.split('>>>')[0].trim();
+  if(S.keyList[base]) S.keyList[base].usedAt=new Date().toISOString();
+  if(!S.recents) S.recents=[];
+  S.recents.unshift({username:u,template:t,keyword:kw,variant:v,status:st,date:today});
+  if(S.recents.length>200) S.recents=S.recents.slice(0,200);
+  save(); updCounters(); renderChips();
+  document.getElementById('f-username').value='';
+  document.getElementById('f-template').value='';
+  document.getElementById('f-notes').value='';
+  document.querySelectorAll('.vpill').forEach(function(p){p.classList.remove('sel');}); S.selVariant='';
+  document.getElementById('splash-sub').textContent='@'+u+' logged to Notion';
+  var sp=document.getElementById('splash'); sp.classList.add('show');
+  setTimeout(function(){sp.classList.remove('show');},2000);
 }
 
-// ─── VARIANT ──────────────────────────────────────────────
-function selectVariant(el, variant) {
-  document.querySelectorAll('.variant-pill').forEach(p => p.classList.remove('selected'));
-  el.classList.add('selected');
-  state.selectedVariant = variant;
+function openModal(){ document.getElementById('modal').classList.add('show'); setTimeout(function(){document.getElementById('modal-input').focus();},300); }
+function closeModal(){ document.getElementById('modal').classList.remove('show'); document.getElementById('modal-input').value=''; }
+function confirmModal(){
+  var raw=document.getElementById('modal-input').value;
+  var lines=raw.split('\n').map(function(l){return l.trim();}).filter(function(l){return l.length>0;});
+  if(!S.keyList) S.keyList={};
+  lines.forEach(function(kw){ var base=kw.split('>>>')[0].trim(); if(base&&!S.keyList[base]) S.keyList[base]={addedAt:new Date().toISOString(),usedAt:null,note:''}; });
+  save(); closeModal(); renderKL();
 }
-
-// KEY LIST ─────────────────────────────────────────────────
-function openKLModal() {
-  document.getElementById('kl-overlay').classList.add('show');
-  setTimeout(() => document.getElementById('kl-input').focus(), 300);
-}
-function closeKLModal() {
-  document.getElementById('kl-overlay').classList.remove('show');
-  document.getElementById('kl-input').value = '';
-}
-function addKeywordsFromModal() {
-  const raw = document.getElementById('kl-input').value;
-  const lines = raw.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-  if (!state.keyList) state.keyList = {};
-  lines.forEach(kw => {
-    const base = kw.split('>>>')[0].trim();
-    if (base && !state.keyList[base]) {
-      state.keyList[base] = { addedAt: new Date().toISOString(), usedAt: null };
-    }
-  });
-  saveState();
-  closeKLModal();
-  renderKeyList();
-}
-function deleteKLKeyword(kw) {
-  if (state.keyList) delete state.keyList[kw];
-  saveState();
-  renderKeyList();
-}
-function saveKLNote(kw, note) {
-  if (!state.keyList) state.keyList = {};
-  if (state.keyList[kw]) {
-    state.keyList[kw].note = note;
-    saveState();
-  }
-}
-function isKLOnCooldown(kw) {
-  if (!state.keyList || !state.keyList[kw] || !state.keyList[kw].usedAt) return false;
-  const usedAt = new Date(state.keyList[kw].usedAt).getTime();
-  const cooldown = (state.defaultCooldown || 3) * 86400000;
-  return (Date.now() - usedAt) < cooldown;
-}
-function klDaysLeft(kw) {
-  if (!state.keyList || !state.keyList[kw] || !state.keyList[kw].usedAt) return 0;
-  const usedAt = new Date(state.keyList[kw].usedAt).getTime();
-  const cooldown = (state.defaultCooldown || 3) * 86400000;
-  return Math.ceil((usedAt + cooldown - Date.now()) / 86400000);
-}
-function markKLUsed(kw) {
-  if (!state.keyList) state.keyList = {};
-  const base = kw.split('>>>')[0].trim();
-  if (state.keyList[base]) {
-    state.keyList[base].usedAt = new Date().toISOString();
-    saveState();
-  }
-}
-function renderKeyList() {
-  const wrap = document.getElementById('kl-list');
-  const countEl = document.getElementById('kl-count');
-  if (!state.keyList || !Object.keys(state.keyList).length) {
-    wrap.innerHTML = '<div class="empty">No keywords yet.<br>Tap + Add Keywords to get started.</div>';
-    if (countEl) countEl.textContent = '';
-    return;
-  }
-  const keys = Object.keys(state.keyList);
-  const onCooldown = keys.filter(k => isKLOnCooldown(k)).length;
-  if (countEl) countEl.textContent = keys.length + ' keywords · ' + onCooldown + ' on cooldown';
-  const sorted = keys.sort((a, b) => {
-    const ac = isKLOnCooldown(a), bc = isKLOnCooldown(b);
-    if (ac === bc) return a.localeCompare(b);
-    return ac ? 1 : -1;
-  });
-  wrap.innerHTML = sorted.map(kw => {
-    const onCD = isKLOnCooldown(kw);
-    const days = onCD ? klDaysLeft(kw) : 0;
-    const note = (state.keyList[kw] && state.keyList[kw].note) ? state.keyList[kw].note : '';
-    const safeKw = kw.replace(/'/g, "\\'");
-    return '<div class="kl-item ' + (onCD ? 'used' : '') + '" style="flex-direction:column;align-items:stretch">' +
-      '<div style="display:flex;align-items:center;justify-content:space-between">' +
-      '<span class="kl-name">' + kw + '</span>' +
-      '<div style="display:flex;align-items:center;gap:8px">' +
-      '<span class="kl-badge ' + (onCD ? 'cooldown' : 'ready') + '">' + (onCD ? days + 'd left' : 'Ready') + '</span>' +
-      '<button class="kl-delete" onclick="deleteKLKeyword('' + safeKw + '')">×</button>' +
-      '</div></div>' +
-      '<input class="kl-note-input" placeholder="Add a note..." value="' + note.replace(/"/g, '&quot;') + '" onchange="saveKLNote('' + safeKw + '', this.value)" />' +
+function delKL(kw){ if(S.keyList) delete S.keyList[kw]; save(); renderKL(); }
+function saveKLNote(kw,note){ if(S.keyList&&S.keyList[kw]){S.keyList[kw].note=note;save();} }
+function klOnCd(kw){ if(!S.keyList||!S.keyList[kw]||!S.keyList[kw].usedAt) return false; var u=new Date(S.keyList[kw].usedAt).getTime(); return (Date.now()-u)<(S.defaultCooldown||3)*86400000; }
+function klDays(kw){ if(!S.keyList||!S.keyList[kw]||!S.keyList[kw].usedAt) return 0; var u=new Date(S.keyList[kw].usedAt).getTime(); return Math.ceil((u+(S.defaultCooldown||3)*86400000-Date.now())/86400000); }
+function renderKL(){
+  var w=document.getElementById('kl-list'); var ce=document.getElementById('kl-count');
+  if(!S.keyList||!Object.keys(S.keyList).length){w.innerHTML='<div class="empty">No keywords yet.<br>Tap + Add Keywords to get started.</div>';if(ce)ce.textContent='';return;}
+  var ks=Object.keys(S.keyList); var onCd=ks.filter(function(k){return klOnCd(k);}).length;
+  if(ce) ce.textContent=ks.length+' keywords · '+onCd+' on cooldown';
+  var sorted=ks.slice().sort(function(a,b){ var ac=klOnCd(a),bc=klOnCd(b); if(ac===bc) return a.localeCompare(b); return ac?1:-1; });
+  w.innerHTML=sorted.map(function(kw){
+    var onCD=klOnCd(kw); var days=onCD?klDays(kw):0;
+    var note=(S.keyList[kw]&&S.keyList[kw].note)?S.keyList[kw].note:'';
+    var sk=esc(kw); var sn=note.replace(/"/g,'&quot;');
+    return '<div class="kl-item '+(onCD?'used':'')+'">'+
+      '<div class="kl-row"><span class="kl-name">'+kw+'</span>'+
+      '<div class="kl-right"><span class="badge '+(onCD?'cd':'ready')+'">'+(onCD?days+'d left':'Ready')+'</span>'+
+      '<button class="kl-del" onclick="delKL(\''+sk+'\')">×</button></div></div>'+
+      '<input class="kl-note" placeholder="Add a note (e.g. dead tag, low traffic...)" value="'+sn+'" onchange="saveKLNote(\''+sk+'\', this.value)">'+
       '</div>';
   }).join('');
 }
 
-// ─── RECENTS ──────────────────────────────────────────────
-function saveRecent(entry) {
-  if (!state.recents) state.recents = [];
-  state.recents.unshift(entry);
-  if (state.recents.length > 200) state.recents = state.recents.slice(0, 200);
-  saveState();
-}
-
-function renderRecents() {
-  const wrap = document.getElementById('recents-list');
-  if (!state.recents || !state.recents.length) {
-    wrap.innerHTML = '<div class="empty">No DMs logged yet.</div>';
-    return;
-  }
-  // Group by date then keyword
-  const byDate = {};
-  state.recents.forEach(r => {
-    if (!byDate[r.date]) byDate[r.date] = {};
-    const kw = r.keyword || 'No keyword';
-    if (!byDate[r.date][kw]) byDate[r.date][kw] = [];
-    byDate[r.date][kw].push(r);
-  });
-  const dates = Object.keys(byDate).sort((a,b) => b.localeCompare(a));
-  wrap.innerHTML = dates.map(date => {
-    const keywords = Object.keys(byDate[date]);
-    return `<div class="day-group">
-      <div class="day-header">${new Date(date + 'T12:00:00').toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric'})}</div>
-      ${keywords.map(kw => `
-        <div class="kw-group">
-          <div class="kw-group-header">${kw} · ${byDate[date][kw].length} DM${byDate[date][kw].length > 1 ? 's' : ''}</div>
-          ${byDate[date][kw].map(r => `
-            <div class="recent-item">
-              <div>
-                <div class="recent-username">@${r.username}</div>
-                ${r.template ? `<div style="font-size:11px;color:var(--muted)">${r.template}</div>` : ''}
-              </div>
-              <div class="recent-meta">
-                <div>${r.status || ''}</div>
-                <div class="recent-variant">${r.variant || ''}</div>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      `).join('')}
-    </div>`;
+function kwRdy(kw){ var d=S.keywords[kw]; if(!d||!d.lastUsed) return true; var cd=((d.cooldownDays||S.defaultCooldown)||3)*86400000; return (Date.now()-new Date(d.lastUsed).getTime())>=cd; }
+function kwDaysL(kw){ var d=S.keywords[kw]; if(!d||!d.lastUsed) return 0; var cd=((d.cooldownDays||S.defaultCooldown)||3)*86400000; return Math.ceil((new Date(d.lastUsed).getTime()+cd-Date.now())/86400000); }
+function renderKwPerf(){
+  var w=document.getElementById('kp-list'); var ks=Object.keys(S.keywords);
+  if(!ks.length){w.innerHTML='<div class="empty">No keywords logged yet.</div>';return;}
+  var sorted=ks.slice().sort(function(a,b){return (S.keywords[b].clients||0)-(S.keywords[a].clients||0);});
+  var maxC=Math.max.apply(null,sorted.map(function(k){return S.keywords[k].clients||0;}))||1;
+  w.innerHTML=sorted.map(function(kw,i){
+    var d=S.keywords[kw]; var rdy=kwRdy(kw); var days=rdy?0:kwDaysL(kw);
+    var pct=Math.round(((d.clients||0)/maxC)*100);
+    var last=d.lastUsed?new Date(d.lastUsed).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'Never';
+    var trophy=(i===0&&(d.clients||0)>0)?' 🏆':'';
+    return '<div class="kw-card"><div class="kw-card-top"><div class="kw-name-big">'+kw+trophy+'</div>'+
+      '<span class="badge '+(rdy?'ready':'cd')+'">'+(rdy?'Ready':days+'d left')+'</span></div>'+
+      '<div class="kw-stats"><div class="kw-stat"><strong>'+(d.clients||0)+'</strong>Clients</div>'+
+      '<div class="kw-stat"><strong>'+(d.uses||0)+'</strong>Uses</div>'+
+      '<div class="kw-stat"><strong>'+last+'</strong>Last Used</div></div>'+
+      '<div class="kw-bar-wrap"><div class="kw-bar" style="width:'+pct+'%"></div></div></div>';
   }).join('');
 }
 
-// ─── SUBMIT ───────────────────────────────────────────────
-async function submitLog() {
-  const username = document.getElementById('username').value.trim();
-  const template = document.getElementById('template').value.trim();
-  const keyword = state.selectedKeyword || document.getElementById('keyword-input').value.trim();
-  const variant = state.selectedVariant;
-  const status = document.getElementById('status').value;
-  const notes = document.getElementById('notes').value.trim();
-
-  if (!username) { showToast('Add a username first', true); return; }
-  if (!keyword) { showToast('Select or type a keyword', true); return; }
-
-  const btn = document.getElementById('submit-btn');
-  btn.disabled = true;
-  btn.textContent = 'Sending...';
-
-  try {
-    const res = await fetch(PIPEDREAM_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username,
-        template,
-        keyword,
-        variant: variant || '',
-        status,
-        notes: notes,
-        date: new Date().toISOString().split('T')[0]
-      })
-    });
-
-    if (res.ok) {
-      if (!state.keywords[keyword]) {
-        state.keywords[keyword] = { uses: 0, clients: 0, lastUsed: null, cooldownDays: state.defaultCooldown };
-      }
-      state.keywords[keyword].uses += 1;
-      state.keywords[keyword].clients += 1;
-      state.keywords[keyword].lastUsed = new Date().toISOString();
-      saveRecent({ username, template, keyword, variant, status, date: new Date().toISOString().split('T')[0] });
-      markKLUsed(keyword);
-      saveState();
-
-      document.getElementById('username').value = '';
-      document.getElementById('template').value = '';
-      document.getElementById('notes').value = '';
-      document.querySelectorAll('.variant-pill').forEach(p => p.classList.remove('selected'));
-      state.selectedVariant = '';
-      renderKeywordChips();
-      // Increment DM counter
-const tod = new Date().toISOString().split('T')[0];
-if (!state.dmCounts) state.dmCounts = {};
-if (!state.dmCounts[tod]) state.dmCounts[tod] = 0;
-state.dmCounts[tod] += 1;
-saveState();
-updateDMCounter();
-
-// Show splash
-const splash = document.getElementById('splash');
-document.getElementById('splash-sub').textContent = username + ' logged to Notion';
-splash.classList.add('show');
-setTimeout(() => splash.classList.remove('show'), 1650);
-    } else {
-      showToast('Something went wrong', true);
-    }
-  } catch(e) {
-    showToast('Network error', true);
-    console.log(e);
-  }
-
-  btn.disabled = false;
-  btn.textContent = 'Submit to Notion →';
-}
-
-// ─── NOTION STATUS CHECK ──────────────────────────────────
-async function checkNotionStatus() {
-  const dot = document.getElementById('status-dot');
-  const txt = document.getElementById('status-text');
-  if (!dot || !txt) return;
-  dot.className = 'dot connecting';
-  txt.textContent = 'Connecting...';
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000);
-    const res = await fetch(PIPEDREAM_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ping: true }),
-      signal: controller.signal
-    });
-    clearTimeout(timeout);
-    dot.className = 'dot connected';
-    txt.textContent = 'Notion connected';
-  } catch(e) {
-    dot.className = 'dot connected';
-    txt.textContent = 'Notion connected';
-  }
-}
-setTimeout(checkNotionStatus, 500);
-
-// ─── KEYWORD DASHBOARD ────────────────────────────────────
-function renderKeywordDashboard() {
-  const wrap = document.getElementById('kw-list');
-  const keywords = Object.keys(state.keywords);
-  if (!keywords.length) {
-    wrap.innerHTML = '<div class="empty">No keywords logged yet.<br>Start DMing to see data here.</div>';
-    return;
-  }
-
-  const sorted = keywords.sort((a, b) => (state.keywords[b].clients || 0) - (state.keywords[a].clients || 0));
-  const maxClients = Math.max(...sorted.map(k => state.keywords[k].clients || 0), 1);
-
-  wrap.innerHTML = sorted.map((kw, i) => {
-    const data = state.keywords[kw];
-    const ready = isKeywordReady(kw);
-    const days = daysUntilReady(kw);
-    const pct = Math.round(((data.clients || 0) / maxClients) * 100);
-    const lastUsed = data.lastUsed ? new Date(data.lastUsed).toLocaleDateString('en-US', { month:'short', day:'numeric' }) : 'Never';
-    const rank = i === 0 && (data.clients || 0) > 0 ? ' 🏆' : '';
-    return `<div class="kw-card">
-      <div class="kw-card-top">
-        <div class="kw-name">${kw}${rank}</div>
-        <div class="kw-badge ${ready ? 'ready' : 'cooldown'}">${ready ? 'Ready' : `${days}d left`}</div>
-      </div>
-      <div class="kw-stats">
-        <div class="kw-stat"><strong>${data.clients || 0}</strong>Clients Found</div>
-        <div class="kw-stat"><strong>${data.uses || 0}</strong>Times Used</div>
-        <div class="kw-stat"><strong>${lastUsed}</strong>Last Used</div>
-      </div>
-      <div class="kw-bar-wrap"><div class="kw-bar" style="width:${pct}%"></div></div>
-    </div>`;
+function renderRecents(){
+  var w=document.getElementById('recents-list');
+  if(!S.recents||!S.recents.length){w.innerHTML='<div class="empty">No DMs logged yet.</div>';return;}
+  var byDate={};
+  S.recents.forEach(function(r){ if(!byDate[r.date]) byDate[r.date]={}; var kw=r.keyword||'No keyword'; if(!byDate[r.date][kw]) byDate[r.date][kw]=[]; byDate[r.date][kw].push(r); });
+  var dates=Object.keys(byDate).sort(function(a,b){return b.localeCompare(a);});
+  w.innerHTML=dates.map(function(date){
+    var lbl=new Date(date+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+    var grps=Object.keys(byDate[date]).map(function(kw){
+      var items=byDate[date][kw].map(function(r){
+        return '<div class="rec-item"><div><div class="rec-user">@'+r.username+'</div>'+(r.template?'<div class="rec-tmpl">'+r.template+'</div>':'')+
+          '</div><div class="rec-right"><div>'+(r.status||'')+'</div><div class="rec-var">'+(r.variant||'')+'</div></div></div>';
+      }).join('');
+      return '<div style="margin-bottom:10px"><div class="kw-grp-hdr">'+kw+' · '+byDate[date][kw].length+' DM'+(byDate[date][kw].length>1?'s':'')+'</div>'+items+'</div>';
+    }).join('');
+    return '<div class="day-group"><div class="day-hdr">'+lbl+'</div>'+grps+'</div>';
   }).join('');
 }
 
-// ─── PER-KW COOLDOWN ──────────────────────────────────────
-function renderPerKwCooldown() {
-  const wrap = document.getElementById('per-kw-cooldown');
-  const keywords = Object.keys(state.keywords);
-  if (!keywords.length) {
-    wrap.innerHTML = '<div class="empty" style="padding:20px 0">No keywords yet</div>';
-    return;
-  }
-  wrap.innerHTML = keywords.map(kw => `
-    <div class="cooldown-setting">
-      <label>${kw}</label>
-      <input type="number" min="1" max="30" value="${state.keywords[kw].cooldownDays || state.defaultCooldown}"
-        onchange="updateKwCooldown('${kw}', this.value)">
-    </div>
-  `).join('');
+function renderPerKw(){
+  var w=document.getElementById('per-kw'); var ks=Object.keys(S.keywords);
+  if(!ks.length){w.innerHTML='<div class="empty" style="padding:10px 0">No keywords yet</div>';return;}
+  w.innerHTML=ks.map(function(kw){ var v=(S.keywords[kw].cooldownDays||S.defaultCooldown||3);
+    return '<div class="setting-row"><span class="setting-lbl">'+kw+'</span>'+
+      '<input type="number" class="setting-inp" min="1" max="30" value="'+v+'" onchange="updKwCd(\''+esc(kw)+'\',this.value)"></div>';
+  }).join('');
+}
+function updKwCd(kw,v){ if(S.keywords[kw]){S.keywords[kw].cooldownDays=parseInt(v);save();} }
+function saveSettings(){
+  S.defaultCooldown=parseInt(document.getElementById('s-cooldown').value)||3;
+  S.token=document.getElementById('s-token').value.trim()||DEF_TOKEN;
+  S.dbId=document.getElementById('s-dbid').value.trim()||DEF_DB;
+  save(); toast('Settings saved');
 }
 
-function updateKwCooldown(kw, val) {
-  if (state.keywords[kw]) {
-    state.keywords[kw].cooldownDays = parseInt(val);
-    saveState();
-  }
+function toast(msg,err){
+  var t=document.getElementById('toast'); t.textContent=msg;
+  t.className='toast'+(err?' err':''); t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},2500);
 }
-
-// ─── SETTINGS ─────────────────────────────────────────────
-function saveCooldown() {
-  state.defaultCooldown = parseInt(document.getElementById('default-cooldown').value) || 3;
-  saveState();
-  showToast('Cooldown saved');
-}
-
-function saveSettings() {
-  state.token = document.getElementById('notion-token').value.trim() || DEFAULT_TOKEN;
-  state.dbId = document.getElementById('notion-db').value.trim() || DEFAULT_DB_ID;
-  state.defaultCooldown = parseInt(document.getElementById('default-cooldown').value) || 3;
-  saveState();
-  showToast('Settings saved');
-}
-
-// ─── TOAST ────────────────────────────────────────────────
-function showToast(msg, error = false) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast' + (error ? ' error' : '');
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
-}
-
-// ─── ENTER KEY ────────────────────────────────────────────
-document.getElementById('keyword-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') { e.preventDefault(); addKeywordFromInput(); }
-});
+function esc(s){ return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+document.getElementById('f-keyword').addEventListener('keydown',function(e){ if(e.key==='Enter'){e.preventDefault();addChip();} });
 </script>
 </body>
 </html>
