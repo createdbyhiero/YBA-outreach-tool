@@ -455,11 +455,11 @@
 </div>
 
 <div class="tabs">
-  <button class="tab active" onclick="switchTab('log')">Log DM</button>
-  <button class="tab" onclick="switchTab('keylist')">Key. List</button>
-  <button class="tab" onclick="switchTab('keywords')">Key. Performance</button>
-  <button class="tab" onclick="switchTab('recents')">Recents</button>
-  <button class="tab" onclick="switchTab('settings')">Settings</button>
+  <button class="tab active" onclick="switchTab('log', this)">Log DM</button>
+  <button class="tab" onclick="switchTab('keylist', this)">Key. List</button>
+  <button class="tab" onclick="switchTab('keywords', this)">Key. Performance</button>
+  <button class="tab" onclick="switchTab('recents', this)">Recents</button>
+  <button class="tab" onclick="switchTab('settings', this)">Settings</button>
 </div>
 
 <!-- LOG DM PANEL -->
@@ -652,10 +652,10 @@ renderKeywordDashboard();
 renderPerKwCooldown();
 
 // ─── TABS ─────────────────────────────────────────────────
-function switchTab(tab) {
+function switchTab(tab, el) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  event.target.classList.add('active');
+  if (el) el.classList.add('active');
   document.getElementById('panel-' + tab).classList.add('active');
   if (tab === 'keywords') renderKeywordDashboard();
   if (tab === 'keylist') renderKeyList();
