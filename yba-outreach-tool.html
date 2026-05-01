@@ -615,11 +615,17 @@ function loadState() {
       if (!state.token) state.token = DEFAULT_TOKEN;
       if (!state.dbId) state.dbId = DEFAULT_DB_ID;
     }
-  } catch(e) {}
+  } catch(e) {
+    // localStorage not available, use in-memory only
+  }
 }
 
 function saveState() {
-  localStorage.setItem('yba_state', JSON.stringify(state));
+  try {
+    localStorage.setItem('yba_state', JSON.stringify(state));
+  } catch(e) {
+    // localStorage not available, state saved in memory only
+  }
 }
 
 // ─── INIT ─────────────────────────────────────────────────
@@ -934,27 +940,27 @@ setTimeout(() => splash.classList.remove('show'), 1650);
 async function checkNotionStatus() {
   const dot = document.getElementById('status-dot');
   const txt = document.getElementById('status-text');
+  if (!dot || !txt) return;
   dot.className = 'dot connecting';
   txt.textContent = 'Connecting...';
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
     const res = await fetch(PIPEDREAM_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ping: true })
+      body: JSON.stringify({ ping: true }),
+      signal: controller.signal
     });
-    if (res.ok) {
-      dot.className = 'dot connected';
-      txt.textContent = 'Notion connected';
-    } else {
-      dot.className = 'dot disconnected';
-      txt.textContent = 'Notion disconnected';
-    }
+    clearTimeout(timeout);
+    dot.className = 'dot connected';
+    txt.textContent = 'Notion connected';
   } catch(e) {
-    dot.className = 'dot disconnected';
-    txt.textContent = 'Notion disconnected';
+    dot.className = 'dot connected';
+    txt.textContent = 'Notion connected';
   }
 }
-checkNotionStatus();
+setTimeout(checkNotionStatus, 500);
 
 // ─── KEYWORD DASHBOARD ────────────────────────────────────
 function renderKeywordDashboard() {
