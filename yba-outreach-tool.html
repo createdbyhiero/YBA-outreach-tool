@@ -217,9 +217,11 @@
     to { transform: scale(1); }
   }
   .splash-title {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 24px;
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+    font-size: 22px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
     color: #b388ff;
     margin-bottom: 8px;
   }
@@ -543,7 +545,7 @@
 <script>
 // ─── CONFIG ───────────────────────────────────────────────
 const PIPEDREAM_URL = 'https://eorp4n2ix9po5lq.m.pipedream.net';
-const DEFAULT_TOKEN = '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';
+const DEFAULT_TOKEN = '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';
 const DEFAULT_DB_ID = '1cda5f4caf47815185a4c0b4b8c6394a';
 
 // ─── STATE ────────────────────────────────────────────────
@@ -729,7 +731,7 @@ updateDMCounter();
 const splash = document.getElementById('splash');
 document.getElementById('splash-sub').textContent = username + ' logged to Notion';
 splash.classList.add('show');
-setTimeout(() => splash.classList.remove('show'), 2000);
+setTimeout(() => splash.classList.remove('show'), 1650);
     } else {
       showToast('Something went wrong', true);
     }
