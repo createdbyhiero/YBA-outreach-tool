@@ -91,6 +91,11 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Mono', monosp
 .kl-name { font-size: 14px; }
 .kl-right { display: flex; align-items: center; gap: 8px; }
 .kl-del { background: none; border: none; color: var(--muted); font-size: 16px; cursor: pointer; padding: 0 0 0 4px; line-height: 1; }
+.kl-hot { background: linear-gradient(90deg, #b8860b, #ffd700, #b8860b); border-radius: 10px 10px 0 0; padding: 5px 12px; font-size: 10px; font-family: 'Syne', sans-serif; font-weight: 700; color: #3d2600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: -1px; }
+.kl-item.hot { border-color: #ffd700; box-shadow: 0 0 8px rgba(255,215,0,0.2); }
+.kl-edit { background: none; border: none; color: var(--muted); font-size: 12px; cursor: pointer; padding: 0 0 0 6px; opacity: 0.6; }
+.kl-edit-input { background: var(--surface2); border: 1px solid var(--accent); border-radius: 6px; color: var(--text); font-family: 'DM Mono', monospace; font-size: 14px; padding: 2px 8px; outline: none; width: 140px; }
+.kl-count-badge { font-size: 10px; background: #1a0a2e; color: var(--accent); border-radius: 10px; padding: 2px 7px; margin-left: 4px; }
 .kl-note { width: 100%; background: none; border: none; border-bottom: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; outline: none; padding: 4px 0; margin-top: 6px; font-style: italic; }
 .kl-note::placeholder { color: #333; }
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.85); z-index: 500; display: flex; align-items: flex-end; opacity: 0; pointer-events: none; transition: opacity .2s; }
@@ -362,33 +367,89 @@ function onOK(u,t,kw,v,st){
 
 function openModal(){ document.getElementById('modal').classList.add('show'); setTimeout(function(){document.getElementById('modal-input').focus();},300); }
 function closeModal(){ document.getElementById('modal').classList.remove('show'); document.getElementById('modal-input').value=''; }
+function cleanKw(raw){
+  // Strip leading bullets, dashes, asterisks, numbers but keep hashtags
+  return raw.replace(/^[-\u2013\u2014\u2022*\u00b7\u25aa\u25b8\u25ba\u2713\u2714>\s]+/,'').replace(/^\d+[.)\s]+/,'').trim();
+}
 function confirmModal(){
   var raw=document.getElementById('modal-input').value;
   var lines=raw.split('\n').map(function(l){return l.trim();}).filter(function(l){return l.length>0;});
   if(!S.keyList) S.keyList={};
-  lines.forEach(function(kw){ var base=kw.split('>>>')[0].trim(); if(base&&!S.keyList[base]) S.keyList[base]={addedAt:new Date().toISOString(),usedAt:null,note:''}; });
+  // Count incoming dupes
+  var incoming={};
+  lines.forEach(function(line){
+    var base=cleanKw(line.split('>>>')[0].trim());
+    if(base) incoming[base]=(incoming[base]||0)+1;
+  });
+  // Merge preserving order
+  Object.keys(incoming).forEach(function(kw){
+    if(S.keyList[kw]){
+      S.keyList[kw].importCount=(S.keyList[kw].importCount||1)+incoming[kw];
+    } else {
+      S.keyList[kw]={addedAt:new Date().toISOString(),usedAt:null,note:'',importCount:incoming[kw],order:Object.keys(S.keyList).length};
+    }
+  });
   save(); closeModal(); renderKL();
 }
 function delKL(kw){ if(S.keyList) delete S.keyList[kw]; save(); renderKL(); }
 function saveKLNote(kw,note){ if(S.keyList&&S.keyList[kw]){S.keyList[kw].note=note;save();} }
 function klOnCd(kw){ if(!S.keyList||!S.keyList[kw]||!S.keyList[kw].usedAt) return false; var u=new Date(S.keyList[kw].usedAt).getTime(); return (Date.now()-u)<(S.defaultCooldown||3)*86400000; }
 function klDays(kw){ if(!S.keyList||!S.keyList[kw]||!S.keyList[kw].usedAt) return 0; var u=new Date(S.keyList[kw].usedAt).getTime(); return Math.ceil((u+(S.defaultCooldown||3)*86400000-Date.now())/86400000); }
+function isHotKw(kw){ return S.keywords&&S.keywords[kw]&&(S.keywords[kw].clients||0)>=5; }
+function startEditKL(kw){
+  var id='kln-'+kw.replace(/[^a-zA-Z0-9]/g,'_');
+  var el=document.getElementById(id); if(!el) return;
+  var inp=document.createElement('input');
+  inp.className='kl-edit-input'; inp.value=kw;
+  inp.onblur=function(){ saveEditKL(kw,inp.value); };
+  inp.onkeydown=function(e){ if(e.key==='Enter') inp.blur(); };
+  el.replaceWith(inp); inp.focus();
+}
+function saveEditKL(oldKw,newKw){
+  newKw=cleanKw(newKw.trim());
+  if(!newKw||newKw===oldKw){renderKL();return;}
+  var data=S.keyList[oldKw]; delete S.keyList[oldKw]; S.keyList[newKw]=data; save(); renderKL();
+}
 function renderKL(){
   var w=document.getElementById('kl-list'); var ce=document.getElementById('kl-count');
   if(!S.keyList||!Object.keys(S.keyList).length){w.innerHTML='<div class="empty">No keywords yet.<br>Tap + Add Keywords to get started.</div>';if(ce)ce.textContent='';return;}
   var ks=Object.keys(S.keyList); var onCd=ks.filter(function(k){return klOnCd(k);}).length;
   if(ce) ce.textContent=ks.length+' keywords · '+onCd+' on cooldown';
-  var sorted=ks.slice().sort(function(a,b){ var ac=klOnCd(a),bc=klOnCd(b); if(ac===bc) return a.localeCompare(b); return ac?1:-1; });
-  w.innerHTML=sorted.map(function(kw){
+  // Hot keywords first, then sorted by importCount desc, then original order
+  var hot=ks.filter(function(k){return isHotKw(k);});
+  var rest=ks.filter(function(k){return !isHotKw(k);});
+  rest.sort(function(a,b){
+    var ac=S.keyList[a]&&S.keyList[a].importCount||1;
+    var bc=S.keyList[b]&&S.keyList[b].importCount||1;
+    if(bc!==ac) return bc-ac; // most dupes first
+    var ao=S.keyList[a]&&S.keyList[a].order||0;
+    var bo=S.keyList[b]&&S.keyList[b].order||0;
+    return ao-bo; // then original insert order
+  });
+  var ordered=hot.concat(rest);
+  w.innerHTML=ordered.map(function(kw){
     var onCD=klOnCd(kw); var days=onCD?klDays(kw):0;
     var note=(S.keyList[kw]&&S.keyList[kw].note)?S.keyList[kw].note:'';
+    var cnt=S.keyList[kw]&&S.keyList[kw].importCount>1?S.keyList[kw].importCount:0;
+    var usedC=(S.keywords&&S.keywords[kw]&&S.keywords[kw].clients)||0;
+    var hotKw=isHotKw(kw);
     var sk=esc(kw); var sn=note.replace(/"/g,'&quot;');
-    return '<div class="kl-item '+(onCD?'used':'')+'">'+
-      '<div class="kl-row"><span class="kl-name">'+kw+'</span>'+
-      '<div class="kl-right"><span class="badge '+(onCD?'cd':'ready')+'">'+(onCD?days+'d left':'Ready')+'</span>'+
-      '<button class="kl-del" onclick="delKL(\''+sk+'\')">×</button></div></div>'+
+    var id='kln-'+kw.replace(/[^a-zA-Z0-9]/g,'_');
+    var hotBanner=hotKw?'<div class="kl-hot">🔥 Hot Keyword · '+usedC+' clients found</div>':'';
+    var dupBadge=cnt?'<span class="kl-count-badge">×'+cnt+'</span>':'';
+    return hotBanner+
+      '<div class="kl-item '+(onCD?'used ':' ')+(hotKw?'hot':'')+'">'+
+      '<div style="flex:1;min-width:0">'+
+      '<div style="display:flex;align-items:center;gap:4px">'+
+      '<span class="kl-name" id="'+id+'">'+kw+'</span>'+dupBadge+
+      '<button class="kl-edit" onclick="startEditKL(\''+sk+'\')" title="Edit">✏️</button>'+
+      '</div>'+
       '<input class="kl-note" placeholder="Add a note (e.g. dead tag, low traffic...)" value="'+sn+'" onchange="saveKLNote(\''+sk+'\', this.value)">'+
-      '</div>';
+      '</div>'+
+      '<div style="display:flex;align-items:center;gap:8px;margin-left:8px;flex-shrink:0">'+
+      '<span class="badge '+(onCD?'cd':'ready')+'">'+(onCD?days+'d left':'Ready')+'</span>'+
+      '<button class="kl-del" onclick="delKL(\''+sk+'\')" title="Delete">×</button>'+
+      '</div></div>';
   }).join('');
 }
 
